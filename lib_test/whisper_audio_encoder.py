@@ -10,7 +10,7 @@ from tqdm.notebook import tqdm
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-class customAudioDataset(Dataset):
+class CustomAudioDataset(Dataset):
       def __init__(self, csv_path):
             self.data = pd.read_csv(csv_path, header=[0, 1])
             self.text_data = self.data['text_data'][' '].values
@@ -30,12 +30,12 @@ class customAudioDataset(Dataset):
             return (mel, self.text_data[idx])
 
 def my_collate(batch):
-    len_batch = len(batch)
+    batch_size = len(batch)
     batch = list(filter(lambda x: x is not None, batch))
 
-    if len_batch > len(batch):
+    if batch_size > len(batch):
         db_len = len(dataset)
-        diff = len_batch - len(batch)
+        diff = batch_size - len(batch)
         while diff != 0:
             a = dataset[np.random.randint(0, db_len)]
             if a is None:
@@ -45,7 +45,7 @@ def my_collate(batch):
 
     return torch.utils.data.dataloader.default_collate(batch)
 
-dataset = customAudioDataset('balance_train.csv')
+dataset = CustomAudioDataset('balance_train.csv')
 
 loader = torch.utils.data.DataLoader(dataset, collate_fn=my_collate, batch_size=16)
 
